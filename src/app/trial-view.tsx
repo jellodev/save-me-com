@@ -39,7 +39,7 @@ export function TrialView() {
 
       <ShareBar
         expiresAt={trial.createdAt + TRIAL_TTL_SECONDS * 1000}
-        shareText={`[살려줘.com] ${trial.defendant}: ${VERDICT_LABELS[trial.verdict]} — ${trial.reason}`}
+        shareText={`${trial.defendant}: ${VERDICT_LABELS[trial.verdict]} — ${trial.reason}`}
       />
 
       <Link
