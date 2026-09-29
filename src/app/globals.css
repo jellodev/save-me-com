@@ -25,6 +25,7 @@ body {
   color: var(--paper);
   background-image: radial-gradient(circle at 50% -20%, #2a1d12 0%, var(--ink) 60%);
   background-attachment: fixed;
+  word-break: keep-all;
 }
 
 @keyframes stamp {

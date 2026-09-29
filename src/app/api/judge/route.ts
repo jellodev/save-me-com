@@ -1,6 +1,6 @@
 import { nanoid } from "nanoid";
 import { z } from "zod";
-import { judge, JudgeRefusedError } from "@/lib/judge";
+import { judge } from "@/lib/judge";
 import { consumeRateLimit, saveTrial } from "@/lib/store";
 import {
   DEFAULT_DEFENDANT,
@@ -40,12 +40,6 @@ export async function POST(request: Request) {
     await saveTrial({ ...verdict, id, defendant, createdAt: Date.now() });
     return Response.json({ id });
   } catch (error) {
-    if (error instanceof JudgeRefusedError) {
-      return Response.json(
-        { error: "재판장이 판결을 거부했다. 증언서를 순화해서 다시 제출하라." },
-        { status: 422 },
-      );
-    }
     console.error(error);
     return Response.json(
       { error: "법정에 정전이 발생했다. 잠시 후 다시 시도하라." },

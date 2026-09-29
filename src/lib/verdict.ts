@@ -2,11 +2,7 @@ import { z } from "zod";
 
 export const VerdictSchema = z.object({
   verdict: z.enum(["SAVED", "DOOMED"]),
-  headline: z.string(),
-  charges: z.array(z.string()),
-  reasoning: z.string(),
-  sentence: z.string(),
-  survivalRate: z.number().int(),
+  reason: z.string(),
 });
 
 export type Verdict = z.infer<typeof VerdictSchema>;

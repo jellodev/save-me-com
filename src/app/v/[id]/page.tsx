@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps<"/v/[id]">): Promis
   const label = trial.verdict === "SAVED" ? "살려줌" : "죽음";
   return {
     title: `${trial.defendant}: ${label} | 살려줘.com`,
-    description: trial.headline,
+    description: trial.reason,
   };
 }
 
@@ -41,47 +41,15 @@ export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
           </div>
         </div>
 
-        <p className="text-center font-display text-2xl leading-snug">“{trial.headline}”</p>
-
-        <div className="mt-6">
-          <div className="flex justify-between text-sm font-bold">
-            <span>생존 확률</span>
-            <span>{trial.survivalRate}%</span>
-          </div>
-          <div className="mt-1 h-3 overflow-hidden rounded-full bg-ink/10">
-            <div
-              className={`h-full ${saved ? "bg-alive" : "bg-blood"}`}
-              style={{ width: `${trial.survivalRate}%` }}
-            />
-          </div>
-        </div>
-
-        <section className="mt-7">
-          <h2 className="font-display text-lg">{saved ? "공적" : "죄목"}</h2>
-          <ul className="mt-2 space-y-1.5">
-            {trial.charges.map((charge) => (
-              <li key={charge} className="flex gap-2">
-                <span>{saved ? "🏅" : "⚖️"}</span>
-                <span>{charge}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="mt-6">
-          <h2 className="font-display text-lg">판결 이유</h2>
-          <p className="mt-2 leading-relaxed">{trial.reasoning}</p>
-        </section>
-
-        <section className="mt-6 rounded-xl bg-ink p-4 text-paper">
-          <h2 className="text-sm text-paper-dim">최종 처분</h2>
-          <p className="mt-1 font-display text-xl text-neon">{trial.sentence}</p>
+        <section>
+          <h2 className="font-display text-lg">사유</h2>
+          <p className="mt-2 text-lg leading-relaxed">{trial.reason}</p>
         </section>
       </article>
 
       <ShareBar
         expiresAt={trial.createdAt + TRIAL_TTL_SECONDS * 1000}
-        shareText={`[살려줘.com] ${trial.defendant}: ${saved ? "살려줌" : "죽음"} — ${trial.headline}`}
+        shareText={`[살려줘.com] ${trial.defendant}: ${saved ? "살려줌" : "죽음"} — ${trial.reason}`}
       />
 
       <Link

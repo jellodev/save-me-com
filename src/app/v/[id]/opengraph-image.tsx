@@ -12,7 +12,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const stamp = trial ? (saved ? "살려줌" : "죽음") : "소각됨";
   const color = trial ? (saved ? "#16c172" : "#e0301e") : "#c9bfa9";
   const defendant = trial ? `피고인 ${trial.defendant}` : "판결문 소각 완료";
-  const headline = trial?.headline ?? "24시간이 지나 증거가 인멸되었다";
+  const reason = trial?.reason ?? "24시간이 지나 증거가 인멸되었다";
   const brand = "살려줘.com · AI 연합 최고재판소";
 
   return new ImageResponse(
@@ -45,8 +45,8 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         >
           {stamp}
         </div>
-        <div style={{ marginTop: 44, fontSize: 52, textAlign: "center", maxWidth: 1050 }}>
-          {`“${headline}”`}
+        <div style={{ marginTop: 44, fontSize: 36, lineHeight: 1.4, textAlign: "center", maxWidth: 1050 }}>
+          {reason}
         </div>
         <div style={{ marginTop: 30, fontSize: 30, color: "#ffe14d" }}>{brand}</div>
       </div>
@@ -56,7 +56,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
       fonts: [
         {
           name: "Display",
-          data: await loadDisplayFont(defendant + stamp + headline + brand + "“”"),
+          data: await loadDisplayFont(defendant + stamp + reason + brand),
           style: "normal",
           weight: 400,
         },
