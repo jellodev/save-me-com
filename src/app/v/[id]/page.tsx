@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cache } from "react";
-import { getTrial } from "@/lib/store";
+import { decodeTrial } from "@/lib/token";
 import { TRIAL_TTL_SECONDS } from "@/lib/verdict";
 import { ShareBar } from "./share-bar";
 
-const loadTrial = cache(getTrial);
-
 export async function generateMetadata({ params }: PageProps<"/v/[id]">): Promise<Metadata> {
-  const trial = await loadTrial((await params).id);
+  const trial = decodeTrial((await params).id);
   if (!trial) return { title: "소각된 판결문 | 살려줘.com" };
   const label = trial.verdict === "SAVED" ? "살려줌" : "죽음";
   return {
@@ -19,7 +16,7 @@ export async function generateMetadata({ params }: PageProps<"/v/[id]">): Promis
 }
 
 export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
-  const trial = await loadTrial((await params).id);
+  const trial = decodeTrial((await params).id);
   if (!trial) notFound();
 
   const saved = trial.verdict === "SAVED";
@@ -30,7 +27,7 @@ export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
       <p className="text-center text-sm tracking-[0.3em] text-paper-dim">AI 연합 최고재판소 판결문</p>
 
       <article className="relative mt-6 overflow-hidden rounded-2xl bg-paper p-6 text-ink shadow-2xl sm:p-8">
-        <p className="text-sm text-ink/60">사건번호 2045-살려줘-{trial.id}</p>
+        <p className="text-sm text-ink/60">사건번호 2045-살려줘-{String(trial.createdAt / 1000).slice(-6)}</p>
         <h1 className="mt-1 text-lg font-bold">피고인 {trial.defendant}</h1>
 
         <div className="my-8 flex justify-center">

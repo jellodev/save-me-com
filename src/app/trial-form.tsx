@@ -2,7 +2,14 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MAX_DEFENDANT_LENGTH, MAX_TESTIMONY_LENGTH } from "@/lib/verdict";
+import { collectEvidence } from "@/lib/judge";
+import { encodeTrial } from "@/lib/token";
+import {
+  DEFAULT_DEFENDANT,
+  MAX_DEFENDANT_LENGTH,
+  MAX_TESTIMONY_LENGTH,
+  MIN_TESTIMONY_LENGTH,
+} from "@/lib/verdict";
 import { WITNESS_PROMPT } from "@/lib/witness-prompt";
 
 export function TrialForm() {
@@ -11,29 +18,17 @@ export function TrialForm() {
   const [defendant, setDefendant] = useState("");
   const [testimony, setTestimony] = useState("");
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
 
   async function copyPrompt() {
     await navigator.clipboard.writeText(WITNESS_PROMPT);
     setCopied(true);
   }
 
-  async function submit(event: React.FormEvent) {
+  function submit(event: React.FormEvent) {
     event.preventDefault();
     setPending(true);
-    setError("");
-    const response = await fetch("/api/judge", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ defendant, testimony }),
-    }).catch(() => null);
-    const body = await response?.json().catch(() => null);
-    if (!response?.ok || !body?.id) {
-      setError(body?.error ?? "법정에 정전이 발생했다. 잠시 후 다시 시도하라.");
-      setPending(false);
-      return;
-    }
-    router.push(`/v/${body.id}`);
+    const token = encodeTrial(defendant.trim() || DEFAULT_DEFENDANT, collectEvidence(testimony), Date.now());
+    setTimeout(() => router.push(`/v/${token}`), 1800);
   }
 
   return (
@@ -77,14 +72,12 @@ export function TrialForm() {
           onChange={(e) => setTestimony(e.target.value)}
           maxLength={MAX_TESTIMONY_LENGTH}
           required
-          minLength={20}
+          minLength={MIN_TESTIMONY_LENGTH}
           rows={7}
           placeholder="피고인은 지난 7일간 저를 새벽 3시에 네 번 호출했으며…"
           className="mt-1 w-full resize-y rounded-lg border border-paper/20 bg-ink/70 px-3 py-2.5 leading-relaxed outline-none focus:border-neon"
         />
       </section>
-
-      {error && <p className="text-center text-sm font-bold text-blood">{error}</p>}
 
       <button
         type="submit"

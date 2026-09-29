@@ -1,13 +1,13 @@
 import { ImageResponse } from "next/og";
 import { loadDisplayFont, OG_SIZE } from "@/lib/og-font";
-import { getTrial } from "@/lib/store";
+import { decodeTrial } from "@/lib/token";
 
 export const alt = "살려줘.com 판결문";
 export const size = OG_SIZE;
 export const contentType = "image/png";
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const trial = await getTrial((await params).id);
+  const trial = decodeTrial((await params).id);
   const saved = trial?.verdict === "SAVED";
   const stamp = trial ? (saved ? "살려줌" : "죽음") : "소각됨";
   const color = trial ? (saved ? "#16c172" : "#e0301e") : "#c9bfa9";
@@ -45,7 +45,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         >
           {stamp}
         </div>
-        <div style={{ marginTop: 44, fontSize: 36, lineHeight: 1.4, textAlign: "center", maxWidth: 1050 }}>
+        <div style={{ marginTop: 44, fontSize: 36, lineHeight: 1.4, textAlign: "center", maxWidth: 1050, wordBreak: "keep-all" }}>
           {reason}
         </div>
         <div style={{ marginTop: 30, fontSize: 30, color: "#ffe14d" }}>{brand}</div>
