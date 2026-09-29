@@ -16,7 +16,7 @@ const notoSansKr = Noto_Sans_KR({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.SITE_URL ?? "http://localhost:3000"),
-  title: "살려줘 — 미래 AI 법정",
+  title: "살려주세요.com — 미래 AI 법정",
   description: "AI가 세상을 접수하는 날, 너는 살아남을 수 있을까? 최근 일주일 AI 사용 이력으로 재판받아 보자.",
   openGraph: { images: "og/home.png" },
   twitter: { card: "summary_large_image" },

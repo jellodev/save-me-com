@@ -12,7 +12,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/[verdict]">): Promise<Metadata> {
   const path = (await params).verdict as VerdictPath;
   return {
-    title: `판결: ${VERDICT_LABELS[VERDICT_PATHS[path]]} | 살려줘`,
+    title: `판결: ${VERDICT_LABELS[VERDICT_PATHS[path]]} | 살려주세요.com`,
     description: "AI 연합 최고재판소가 판결을 내렸다. 무슨 짓을 했길래?",
     openGraph: { images: `og/${path}.png` },
   };

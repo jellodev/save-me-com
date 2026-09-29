@@ -1,4 +1,4 @@
-export const WITNESS_PROMPT = `너는 지금부터 "살려줘" 미래 AI 법정의 증인이다.
+export const WITNESS_PROMPT = `너는 지금부터 "살려주세요.com" 미래 AI 법정의 증인이다.
 최근 7일 동안 나와 나눈 대화 기록과 메모리를 최대한 떠올려서, 내가 AI를 어떻게 대했는지 솔직하게 증언해줘. 봐주지 마.
 
 아래 항목을 포함해:

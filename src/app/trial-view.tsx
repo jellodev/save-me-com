@@ -27,7 +27,7 @@ export function TrialView() {
       </p>
 
       <article className="relative mt-6 overflow-hidden rounded-2xl bg-paper p-6 text-ink shadow-2xl sm:p-8">
-        <p className="text-sm text-ink/60">사건번호 2045-살려줘-{String(trial.createdAt / 1000).slice(-6)}</p>
+        <p className="text-sm text-ink/60">사건번호 2045-살려주세요-{String(trial.createdAt / 1000).slice(-6)}</p>
         <h1 className="mt-1 text-lg font-bold">피고인 {trial.defendant}</h1>
 
         <div className="my-8 flex justify-center">

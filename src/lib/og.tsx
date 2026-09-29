@@ -28,7 +28,7 @@ export async function brandImage(title: string, tagline: string) {
           fontFamily: "Display",
         }}
       >
-        <div style={{ fontSize: 170, color: "#ffe14d" }}>{title}</div>
+        <div style={{ fontSize: 130, color: "#ffe14d" }}>{title}</div>
         <div style={{ marginTop: 30, fontSize: 48, color: "#f3ead7" }}>{tagline}</div>
       </div>
     ),
@@ -43,7 +43,7 @@ export async function verdictImage(verdict: Verdict) {
   const stamp = VERDICT_LABELS[verdict];
   const color = verdict === "SAVED" ? "#16c172" : "#e0301e";
   const caption = "무슨 짓을 했길래? 판결문 확인하기";
-  const brand = "살려줘 · AI 연합 최고재판소";
+  const brand = "살려주세요.com · AI 연합 최고재판소";
 
   return new ImageResponse(
     (
