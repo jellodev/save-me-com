@@ -12,6 +12,7 @@ import {
   MIN_TESTIMONY_LENGTH,
 } from "@/lib/verdict";
 import { verdictPath } from "@/lib/verdict-path";
+import { rememberOwnTrial, wasReferred } from "@/lib/visitor";
 import { WITNESS_PROMPT } from "@/lib/witness-prompt";
 
 export function TrialForm() {
@@ -34,7 +35,8 @@ export function TrialForm() {
     const token = encodeTrial(defendant.trim() || DEFAULT_DEFENDANT, evidence, Date.now());
     const { verdict } = decide(evidence);
     const path = verdictPath(verdict);
-    track("start_trial", { verdict });
+    track("start_trial", { verdict, source: wasReferred() ? "shared_link" : "direct" });
+    rememberOwnTrial(token);
     setTimeout(() => router.push(`/${path}/?t=${token}`), 1800);
   }
 
