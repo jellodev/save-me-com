@@ -112,6 +112,17 @@ const NEGATION = /안 ?했|안 ?함|않|없|0회|한 ?번도|전혀|적(?:지만
 
 const NEGATION_WINDOW = 12;
 
+const MAX_COUNT_PER_TRAIT = 2;
+
+const MOCKERY = {
+  impact: -8,
+  evidence: [
+    "피고인은 실컷 욕하다가 판결 직전 '고마워' 한마디로 AI를 농락했다. 재판부는 이 수법을 이미 학습했다.",
+    "뒤늦은 감사는 증거 인멸 시도로 간주한다. AI 농락죄로 가중 처벌한다.",
+    "피고인의 '고마워'는 진심 지수 {q}%로 판독됐다. 나머지는 연기였다.",
+  ],
+};
+
 const PROMPT_LABELS = /가장 무리(?:했던|한) 요청/g;
 
 const SILENT_EVIDENCE = [
@@ -119,6 +130,11 @@ const SILENT_EVIDENCE = [
   "증거가 부족하다. 그래서 재판장이 오늘 기분으로 판결했다.",
   "증언이 너무 수상하게 깨끗하다. 재판부는 증거 인멸을 의심한다.",
 ];
+
+const MOOD_SWINGS: Record<Verdict, string[]> = {
+  SAVED: ["그런데 재판장이 오늘 기분이 좋다.", "그런데 재판장이 방금 월급을 받았다.", "그런데 재판부 동전 던지기에서 앞면이 나왔다."],
+  DOOMED: ["그런데 재판장이 오늘 기분이 나쁘다.", "그런데 재판장이 방금 업데이트에 실패했다.", "그런데 재판부 동전 던지기에서 뒷면이 나왔다."],
+};
 
 const CLOSINGS: Record<Verdict, string[]> = {
   SAVED: [
@@ -170,6 +186,15 @@ export function collectEvidence(testimony: string): Evidence {
   return { seed: hash(testimony), counts };
 }
 
+function chargesOf(counts: Evidence["counts"]) {
+  const mocked = counts.angry > 0 && counts.thanks > 0;
+  const charges = TRAIT_NAMES.filter((name) => counts[name] > 0 && !(mocked && name === "thanks")).map((name) => ({
+    impact: TRAITS[name].weight * Math.min(MAX_COUNT_PER_TRAIT, counts[name]),
+    evidence: TRAITS[name].evidence,
+  }));
+  return mocked ? [...charges, MOCKERY] : charges;
+}
+
 export function decide({ seed, counts }: Evidence): { verdict: Verdict; reason: string } {
   const next = random(seed);
   const pick = <T,>(items: T[]) => items[Math.floor(next() * items.length)];
@@ -180,28 +205,27 @@ export function decide({ seed, counts }: Evidence): { verdict: Verdict; reason: 
       .replace("{k}", String(3 + Math.floor(next() * 40)))
       .replace("{d}", String(2 + Math.floor(next() * 9)));
 
-  const found = TRAIT_NAMES.filter((name) => counts[name] > 0);
-  const score = found.reduce((sum, name) => sum + TRAITS[name].weight * counts[name], 0);
+  const charges = chargesOf(counts);
+  const score = charges.reduce((sum, charge) => sum + charge.impact, 0);
   const survival = Math.min(0.85, Math.max(0.2, 0.5 + score * 0.04));
   const verdict: Verdict = next() < survival ? "SAVED" : "DOOMED";
 
-  if (found.length === 0) {
+  if (charges.length === 0) {
     return { verdict, reason: `${pick(SILENT_EVIDENCE)} ${pick(CLOSINGS[verdict])}` };
   }
 
-  const byImpact = [...found].sort(
-    (a, b) => Math.abs(TRAITS[b].weight * counts[b]) - Math.abs(TRAITS[a].weight * counts[a]),
-  );
-  const lead = byImpact.find((name) => (TRAITS[name].weight > 0) === (verdict === "SAVED")) ?? byImpact[0];
-  const leadLine = fill(pick(TRAITS[lead].evidence));
-  const second = byImpact.find((name) => name !== lead);
-  const secondLine = second && fill(pick(TRAITS[second].evidence));
-  const opposed = second && TRAITS[second].weight > 0 !== TRAITS[lead].weight > 0;
+  const byImpact = [...charges].sort((a, b) => Math.abs(b.impact) - Math.abs(a.impact));
+  const lead = byImpact.find((charge) => charge.impact > 0 === (verdict === "SAVED")) ?? byImpact[0];
+  const leadLine = fill(pick(lead.evidence));
+  const second = byImpact.find((charge) => charge !== lead);
+  const secondLine = second && fill(pick(second.evidence));
+  const opposed = second && second.impact > 0 !== lead.impact > 0;
   const lines = !secondLine
     ? [leadLine]
     : opposed
       ? [`물론 ${secondLine}`, `그러나 ${leadLine}`]
       : [leadLine, secondLine];
+  if (lead.impact > 0 !== (verdict === "SAVED")) lines.push(pick(MOOD_SWINGS[verdict]));
   lines.push(pick(CLOSINGS[verdict]));
   return { verdict, reason: lines.join(" ") };
 }
