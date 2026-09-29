@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareText: string }) {
   const [remaining, setRemaining] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const url = window.location.href;
 
   useEffect(() => {
     const tick = () => setRemaining(Math.max(0, expiresAt - Date.now()));
@@ -14,7 +16,6 @@ export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareTex
   }, [expiresAt]);
 
   async function share() {
-    const url = window.location.href;
     const mobile = window.matchMedia("(pointer: coarse)").matches;
     if (mobile && navigator.share) {
       try {
@@ -26,6 +27,11 @@ export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareTex
     }
     await navigator.clipboard.writeText(`${shareText}\n${url}`);
     setCopied(true);
+  }
+
+  async function copyLink() {
+    await navigator.clipboard.writeText(url);
+    setLinkCopied(true);
   }
 
   return (
@@ -40,6 +46,22 @@ export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareTex
       >
         {copied ? "복사됨! 카톡에 붙여넣어" : "판결문 공유하기"}
       </button>
+      <div className="mt-2 flex gap-2">
+        <input
+          readOnly
+          value={url}
+          onFocus={(e) => e.currentTarget.select()}
+          aria-label="판결문 링크"
+          className="min-w-0 flex-1 rounded-xl border border-paper/30 bg-ink/70 px-3 py-3 font-mono text-xs text-paper-dim outline-none focus:border-neon"
+        />
+        <button
+          type="button"
+          onClick={copyLink}
+          className="shrink-0 rounded-xl border border-paper/30 px-4 py-3 font-bold"
+        >
+          {linkCopied ? "복사됨!" : "복사하기"}
+        </button>
+      </div>
     </div>
   );
 }
