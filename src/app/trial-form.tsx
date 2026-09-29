@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 import { collectEvidence, decide } from "@/lib/judge";
 import { encodeTrial } from "@/lib/token";
 import {
@@ -23,6 +24,7 @@ export function TrialForm() {
   async function copyPrompt() {
     await navigator.clipboard.writeText(WITNESS_PROMPT);
     setCopied(true);
+    track("copy_prompt");
   }
 
   function submit(event: React.FormEvent) {
@@ -30,7 +32,9 @@ export function TrialForm() {
     setPending(true);
     const evidence = collectEvidence(testimony);
     const token = encodeTrial(defendant.trim() || DEFAULT_DEFENDANT, evidence, Date.now());
-    const path = verdictPath(decide(evidence).verdict);
+    const { verdict } = decide(evidence);
+    const path = verdictPath(verdict);
+    track("start_trial", { verdict });
     setTimeout(() => router.push(`/${path}/?t=${token}`), 1800);
   }
 

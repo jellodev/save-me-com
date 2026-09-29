@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { track } from "@/lib/analytics";
 
 export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareText: string }) {
   const [remaining, setRemaining] = useState<number | null>(null);
@@ -20,6 +21,7 @@ export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareTex
     if (mobile && navigator.share) {
       try {
         await navigator.share({ text: shareText, url });
+        track("share_verdict", { method: "share_sheet" });
         return;
       } catch (error) {
         if (error instanceof DOMException && error.name === "AbortError") return;
@@ -27,11 +29,13 @@ export function ShareBar({ expiresAt, shareText }: { expiresAt: number; shareTex
     }
     await navigator.clipboard.writeText(`${shareText}\n${url}`);
     setCopied(true);
+    track("share_verdict", { method: "copy" });
   }
 
   async function copyLink() {
     await navigator.clipboard.writeText(url);
     setLinkCopied(true);
+    track("copy_link");
   }
 
   return (

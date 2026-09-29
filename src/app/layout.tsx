@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Black_Han_Sans, Noto_Sans_KR } from "next/font/google";
+import { GA_ID } from "@/lib/analytics";
 import "./globals.css";
 
 const blackHanSans = Black_Han_Sans({
@@ -25,6 +26,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="ko" className={`${blackHanSans.variable} ${notoSansKr.variable} h-full antialiased`}>
       <head>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${GA_ID}');`,
+          }}
+        />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5123903657285769"
