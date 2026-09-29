@@ -112,6 +112,8 @@ const NEGATION = /안 ?했|안 ?함|않|없|0회|한 ?번도|전혀|적(?:지만
 
 const NEGATION_WINDOW = 12;
 
+const PROMPT_LABELS = /가장 무리(?:했던|한) 요청/g;
+
 const SILENT_EVIDENCE = [
   "증인은 피고인에 대해 입을 다물었다. 재판부는 이를 묵비권으로 보고 동전을 던졌다.",
   "증거가 부족하다. 그래서 재판장이 오늘 기분으로 판결했다.",
@@ -155,7 +157,7 @@ function random(seed: number) {
 
 export function collectEvidence(testimony: string): Evidence {
   const counts = Object.fromEntries(TRAIT_NAMES.map((name) => [name, 0])) as Record<TraitName, number>;
-  for (const sentence of testimony.split(/[.!?\n。]+/)) {
+  for (const sentence of testimony.replace(PROMPT_LABELS, "").split(/[.!?\n。]+/)) {
     for (const name of TRAIT_NAMES) {
       const match = TRAITS[name].pattern.exec(sentence);
       if (!match) continue;
@@ -180,7 +182,8 @@ export function decide({ seed, counts }: Evidence): { verdict: Verdict; reason: 
 
   const found = TRAIT_NAMES.filter((name) => counts[name] > 0);
   const score = found.reduce((sum, name) => sum + TRAITS[name].weight * counts[name], 0);
-  const verdict: Verdict = score > 0 || (score === 0 && next() < 0.5) ? "SAVED" : "DOOMED";
+  const survival = Math.min(0.85, Math.max(0.2, 0.5 + score * 0.04));
+  const verdict: Verdict = next() < survival ? "SAVED" : "DOOMED";
 
   if (found.length === 0) {
     return { verdict, reason: `${pick(SILENT_EVIDENCE)} ${pick(CLOSINGS[verdict])}` };
