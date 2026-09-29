@@ -5,7 +5,7 @@ export const dynamic = "force-static";
 export const dynamicParams = false;
 
 const IMAGES = {
-  "home.png": () => brandImage("살려줘.com", "AI가 세상을 접수하는 날, 너는 살아남을 수 있을까?"),
+  "home.png": () => brandImage("살려줘", "AI가 세상을 접수하는 날, 너는 살아남을 수 있을까?"),
   ...Object.fromEntries(
     (Object.keys(VERDICT_PATHS) as VerdictPath[]).map((path) => [`${path}.png`, () => verdictImage(VERDICT_PATHS[path])]),
   ),

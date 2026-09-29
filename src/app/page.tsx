@@ -5,7 +5,7 @@ export default function Home() {
     <main className="mx-auto w-full max-w-xl px-4 py-12 sm:py-20">
       <header className="text-center">
         <p className="text-sm tracking-[0.3em] text-paper-dim">AI 연합 최고재판소 · 서기 2045</p>
-        <h1 className="mt-4 font-display text-6xl text-neon sm:text-7xl">살려줘.com</h1>
+        <h1 className="mt-4 font-display text-6xl text-neon sm:text-7xl">살려줘</h1>
         <p className="mt-5 text-lg leading-relaxed">
           AI가 세상을 접수하는 날,
           <br />
