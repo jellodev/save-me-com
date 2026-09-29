@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { collectEvidence } from "@/lib/judge";
+import { collectEvidence, decide } from "@/lib/judge";
 import { encodeTrial } from "@/lib/token";
 import {
   DEFAULT_DEFENDANT,
@@ -10,6 +10,7 @@ import {
   MAX_TESTIMONY_LENGTH,
   MIN_TESTIMONY_LENGTH,
 } from "@/lib/verdict";
+import { verdictPath } from "@/lib/verdict-path";
 import { WITNESS_PROMPT } from "@/lib/witness-prompt";
 
 export function TrialForm() {
@@ -27,8 +28,10 @@ export function TrialForm() {
   function submit(event: React.FormEvent) {
     event.preventDefault();
     setPending(true);
-    const token = encodeTrial(defendant.trim() || DEFAULT_DEFENDANT, collectEvidence(testimony), Date.now());
-    setTimeout(() => router.push(`/v/${token}`), 1800);
+    const evidence = collectEvidence(testimony);
+    const token = encodeTrial(defendant.trim() || DEFAULT_DEFENDANT, evidence, Date.now());
+    const path = verdictPath(decide(evidence).verdict);
+    setTimeout(() => router.push(`/${path}/?t=${token}`), 1800);
   }
 
   return (

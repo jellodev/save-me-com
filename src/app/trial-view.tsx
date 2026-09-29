@@ -1,23 +1,16 @@
-import type { Metadata } from "next";
+"use client";
+
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { decodeTrial } from "@/lib/token";
 import { TRIAL_TTL_SECONDS } from "@/lib/verdict";
+import { VERDICT_LABELS } from "@/lib/verdict-path";
+import { Burned } from "./burned";
 import { ShareBar } from "./share-bar";
 
-export async function generateMetadata({ params }: PageProps<"/v/[id]">): Promise<Metadata> {
-  const trial = decodeTrial((await params).id);
-  if (!trial) return { title: "소각된 판결문 | 살려줘.com" };
-  const label = trial.verdict === "SAVED" ? "살려줌" : "죽음";
-  return {
-    title: `${trial.defendant}: ${label} | 살려줘.com`,
-    description: trial.reason,
-  };
-}
-
-export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
-  const trial = decodeTrial((await params).id);
-  if (!trial) notFound();
+export function TrialView() {
+  const trial = decodeTrial(useSearchParams().get("t") ?? "");
+  if (!trial) return <Burned />;
 
   const saved = trial.verdict === "SAVED";
   const accent = saved ? "text-alive border-alive" : "text-blood border-blood";
@@ -34,7 +27,7 @@ export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
           <div
             className={`animate-stamp rounded-xl border-[6px] px-8 py-3 font-display text-7xl sm:text-8xl ${accent}`}
           >
-            {saved ? "살려줌" : "죽음"}
+            {VERDICT_LABELS[trial.verdict]}
           </div>
         </div>
 
@@ -46,7 +39,7 @@ export default async function TrialPage({ params }: PageProps<"/v/[id]">) {
 
       <ShareBar
         expiresAt={trial.createdAt + TRIAL_TTL_SECONDS * 1000}
-        shareText={`[살려줘.com] ${trial.defendant}: ${saved ? "살려줌" : "죽음"} — ${trial.reason}`}
+        shareText={`[살려줘.com] ${trial.defendant}: ${VERDICT_LABELS[trial.verdict]} — ${trial.reason}`}
       />
 
       <Link
