@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { track } from "@/lib/analytics";
 import { collectEvidence, decide } from "@/lib/judge";
+import { sitePath } from "@/lib/site-path";
 import { encodeTrial } from "@/lib/token";
 import {
   DEFAULT_DEFENDANT,
@@ -16,7 +16,6 @@ import { rememberOwnTrial, wasReferred } from "@/lib/visitor";
 import { WITNESS_PROMPT } from "@/lib/witness-prompt";
 
 export function TrialForm() {
-  const router = useRouter();
   const [copied, setCopied] = useState(false);
   const [defendant, setDefendant] = useState("");
   const [testimony, setTestimony] = useState("");
@@ -37,7 +36,7 @@ export function TrialForm() {
     const path = verdictPath(verdict);
     track("start_trial", { verdict, source: wasReferred() ? "shared_link" : "direct" });
     rememberOwnTrial(token);
-    setTimeout(() => router.push(`/${path}/?t=${token}`), 1800);
+    setTimeout(() => window.location.assign(sitePath(`/${path}/?t=${token}`)), 1800);
   }
 
   return (

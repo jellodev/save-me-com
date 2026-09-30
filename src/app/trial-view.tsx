@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { track } from "@/lib/analytics";
 import { decodeTrial } from "@/lib/token";
 import { TRIAL_TTL_SECONDS } from "@/lib/verdict";
 import { VERDICT_LABELS } from "@/lib/verdict-path";
+import { sitePath } from "@/lib/site-path";
 import { isOwnTrial, markReferred } from "@/lib/visitor";
 import { Burned } from "./burned";
 import { ShareBar } from "./share-bar";
@@ -45,8 +45,8 @@ export function TrialView() {
       </article>
 
       {!own && (
-        <Link
-          href="/"
+        <a
+          href={sitePath("/")}
           onClick={() => {
             markReferred();
             track("visitor_cta");
@@ -54,7 +54,7 @@ export function TrialView() {
           className="mt-8 block rounded-2xl bg-blood py-5 text-center font-display text-2xl text-paper shadow-[0_0_40px_-10px_var(--blood)] transition active:scale-[0.98]"
         >
           너도 살아남을 수 있을까? 재판받기
-        </Link>
+        </a>
       )}
 
       <ShareBar
@@ -63,12 +63,12 @@ export function TrialView() {
       />
 
       {own && (
-        <Link
-          href="/"
+        <a
+          href={sitePath("/")}
           className="mt-4 block rounded-2xl border-2 border-paper/30 py-4 text-center font-display text-xl"
         >
           다시 재판받기
-        </Link>
+        </a>
       )}
     </main>
   );

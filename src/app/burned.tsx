@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { sitePath } from "@/lib/site-path";
 
 export function Burned() {
   return (
@@ -10,9 +10,9 @@ export function Burned() {
         <br />
         피고인의 운명은 이제 아무도 모른다.
       </p>
-      <Link href="/" className="mt-10 rounded-2xl bg-blood px-10 py-4 font-display text-xl">
+      <a href={sitePath("/")} className="mt-10 rounded-2xl bg-blood px-10 py-4 font-display text-xl">
         나도 재판받기
-      </Link>
+      </a>
     </main>
   );
 }
